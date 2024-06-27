@@ -69,4 +69,19 @@ public class MissionStepTest {
                 .statusCode(200)
                 .body("size()", is(0));
     }
+
+    @Test
+    void 사단계() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "브라운");
+        params.put("date", "");
+        params.put("time", "");
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
+    }
 }

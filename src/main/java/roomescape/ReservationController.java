@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,9 @@ public class ReservationController {
 
     @PostMapping("/reservations")
     public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation) {
+        if (isReservationArgumentEmpty(reservation)) {
+            throw new IllegalArgumentException("잘못된 요청입니다.");
+        }
         Reservation newReservation = Reservation.toEntity(index.incrementAndGet(), reservation);
         reservations.add(newReservation);
         return ResponseEntity.created(URI.create("/reservations/" + newReservation.getId())).body(newReservation);
@@ -46,5 +50,20 @@ public class ReservationController {
         reservations.remove(reservation);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Void> handlerIllegalArgumentException(IllegalArgumentException e) {
+        System.out.println("IllegalArgumentException occurred: " + e.getMessage());
+        return ResponseEntity.badRequest().build();
+    }
+
+    private boolean isReservationArgumentEmpty(Reservation reservation) {
+        return isStringEmpty(reservation.getName()) || isStringEmpty(reservation.getDate()) || isStringEmpty(
+                reservation.getTime());
+    }
+
+    private boolean isStringEmpty(String argument) {
+        return argument == null || argument.trim().isEmpty();
     }
 }

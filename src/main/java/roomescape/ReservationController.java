@@ -30,7 +30,7 @@ public class ReservationController {
         if (isReservationArgumentEmpty(reservation)) {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }
-        Reservation newReservation = Reservation.toEntity(index.incrementAndGet(), reservation);
+        Reservation newReservation = Reservation.of(index.incrementAndGet(), reservation);
         reservations.add(newReservation);
         return ResponseEntity.created(URI.create("/reservations/" + newReservation.getId())).body(newReservation);
     }

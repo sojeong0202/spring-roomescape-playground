@@ -6,6 +6,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -15,7 +16,8 @@ import org.springframework.test.annotation.DirtiesContext;
 public class MissionStepTest {
 
     @Test
-    void 일단계() {
+    @DisplayName("홈 화면 구현 테스트")
+    void should_goHomePage_when_defaultURI() {
         RestAssured.given().log().all()
                 .when().get("/")
                 .then().log().all()
@@ -23,21 +25,27 @@ public class MissionStepTest {
     }
 
     @Test
-    void 이단계() {
+    @DisplayName("예약 관리 페이지 이동 테스트")
+    void should_goReservationPage_when_reservationURI() {
         RestAssured.given().log().all()
                 .when().get("/reservation")
                 .then().log().all()
                 .statusCode(200);
+    }
 
+    @Test
+    @DisplayName("예약 전체 목록 조회 API 테스트")
+    void should_readAllReservations_when_getMethodReservationsURI() {
         RestAssured.given().log().all()
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(0)); // 아직 생성 요청이 없으니 Controller에서 임의로 넣어준 Reservation 갯수 만큼 검증하거나 0개임을 확인하세요.
+                .body("size()", is(0));
     }
 
     @Test
-    void 삼단계() {
+    @DisplayName("예약 추가 API 테스트")
+    void should_createReservation_when_postMethodReservationsURI() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "브라운");
         params.put("date", "2023-08-05");
@@ -57,6 +65,20 @@ public class MissionStepTest {
                 .then().log().all()
                 .statusCode(200)
                 .body("size()", is(1));
+    }
+
+    @Test
+    @DisplayName("예약 취소 API 테스트")
+    void should_deleteReservation_when_getMethodReservationsIdURI() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "브라운");
+        params.put("date", "2023-08-05");
+        params.put("time", "15:40");
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(params)
+                .when().post("/reservations");
 
         RestAssured.given().log().all()
                 .when().delete("/reservations/1")
@@ -71,7 +93,29 @@ public class MissionStepTest {
     }
 
     @Test
-    void 사단계() {
+    @DisplayName("예약 추가 시 필요한 인자값이 비어있는 경우 예외 처리 테스트")
+    void should_occurIllegalArgumentException_when_createReservationArgumentIsNull() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "브라운");
+        params.put("date", "");
+        params.put("time", "");
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
+
+        RestAssured.given().log().all()
+                .when().delete("/reservations/1")
+                .then().log().all()
+                .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("예약 삭제 시 해당하는 예약을 찾을 수 없을 경우 예외 처리 테스트")
+    void should_occurIllegalArgumentException_when_reservationIsNotFound() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "브라운");
         params.put("date", "");

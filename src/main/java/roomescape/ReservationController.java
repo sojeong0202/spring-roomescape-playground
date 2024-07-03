@@ -16,8 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Controller
 public class ReservationController {
 
+    private final ReservationDAO reservationDAO;
     private final List<Reservation> reservations = new ArrayList<>();
     private final AtomicLong index = new AtomicLong(0);
+
+    public ReservationController(ReservationDAO reservationDAO) {
+        this.reservationDAO = reservationDAO;
+    }
 
     @GetMapping("/reservation")
     public String goReservationPage() {
@@ -36,7 +41,7 @@ public class ReservationController {
 
     @GetMapping("/reservations")
     public ResponseEntity<List<Reservation>> readAllReservations() {
-        return ResponseEntity.ok().body(reservations);
+        return ResponseEntity.ok().body(reservationDAO.findAllReservations());
     }
 
     @DeleteMapping("/reservations/{id}")

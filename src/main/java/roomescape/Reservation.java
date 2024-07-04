@@ -14,6 +14,12 @@ public class Reservation {
     private String date;
     private String time;
 
+    public Reservation(String name, String date, String time) {
+        this.name = name;
+        this.date = date;
+        this.time = time;
+    }
+
     public static Reservation of(Long id, Reservation reservation) {
         return new Reservation(id, reservation.name, reservation.date, reservation.time);
     }

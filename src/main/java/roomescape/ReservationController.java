@@ -2,7 +2,6 @@ package roomescape;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,16 +26,12 @@ public class ReservationController {
     }
 
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationResponseDto> createReservation(
-            @RequestBody ReservationSaveRequestDto reservationSaveRequestDto) {
-        if (isReservationArgumentEmpty(reservationSaveRequestDto)) {
+    public ResponseEntity<ReservationResponseDto> createReservation(@RequestBody ReservationSaveRequestDto requestDto) {
+        if (isReservationArgumentEmpty(requestDto)) {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }
 
-        Reservation reservation = new Reservation(
-                reservationSaveRequestDto.getName(),
-                reservationSaveRequestDto.getDate(),
-                reservationSaveRequestDto.getTime());
+        Reservation reservation = new Reservation(requestDto.getName(), requestDto.getDate(), requestDto.getTime());
 
         Long id = reservationDAO.insert(reservation);
 
@@ -55,20 +50,14 @@ public class ReservationController {
 
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
-        Reservation reservation = reservations.stream()
-                .filter(it -> Objects.equals(it.getId(), id))
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
-
-        reservations.remove(reservation);
-
+        reservationDAO.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    private boolean isReservationArgumentEmpty(ReservationSaveRequestDto reservationSaveRequestDto) {
-        return isStringEmpty(reservationSaveRequestDto.getName())
-                || isStringEmpty(reservationSaveRequestDto.getDate())
-                || isStringEmpty(reservationSaveRequestDto.getTime());
+    private boolean isReservationArgumentEmpty(ReservationSaveRequestDto requestDto) {
+        return isStringEmpty(requestDto.getName())
+                || isStringEmpty(requestDto.getDate())
+                || isStringEmpty(requestDto.getTime());
     }
 
     private boolean isStringEmpty(String argument) {

@@ -48,4 +48,18 @@ public class ReservationDAO {
                     return reservation;
                 });
     }
+
+    public void delete(Long id) {
+        if (countReservationById(id) == 0) {
+            throw new IllegalArgumentException("해당 예약이 존재하지 않습니다.");
+        }
+
+        jdbcTemplate.update("DELETE FROM reservation WHERE id = ?", id);
+    }
+
+    private int countReservationById(Long id) {
+        String sql = "SELECT count(*) FROM reservation WHERE id = ?";
+        int rowCount = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        return rowCount;
+    }
 }

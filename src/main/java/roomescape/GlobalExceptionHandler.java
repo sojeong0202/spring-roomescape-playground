@@ -9,7 +9,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Void> handleIllegalArgumentException(IllegalArgumentException e) {
-        System.out.println("IllegalArgumentException occurred: " + e.getMessage());
         return ResponseEntity.badRequest().build();
     }
 }

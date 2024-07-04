@@ -125,6 +125,12 @@ public class MissionStepTest {
     @DisplayName("예약 취소 시 해당하는 예약을 찾을 수 없을 경우 예외 처리 테스트")
     void should_occurIllegalArgumentException_when_reservationIsNotFound() {
         RestAssured.given().log().all()
+                .when().get("reservations")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(0));
+
+        RestAssured.given().log().all()
                 .when().delete("/reservations/1")
                 .then().log().all()
                 .statusCode(400);
@@ -180,5 +186,30 @@ public class MissionStepTest {
 
         Integer count = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
         assertThat(count).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("데이터 삭제 테스트")
+    void should_deleteReservationAtDB_when_getMethodReservationsIdURI() {
+        Map<String, String> params = new HashMap<>();
+        params.put("name", "브라운");
+        params.put("date", "2023-08-05");
+        params.put("time", "10:00");
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201)
+                .header("Location", "/reservations/1");
+
+        RestAssured.given().log().all()
+                .when().delete("/reservations/1")
+                .then().log().all()
+                .statusCode(204);
+
+        Integer countAfterDelete = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
+        assertThat(countAfterDelete).isEqualTo(0);
     }
 }

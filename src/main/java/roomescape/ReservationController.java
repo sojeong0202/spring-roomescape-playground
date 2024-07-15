@@ -1,10 +1,8 @@
 package roomescape;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,8 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Controller
 public class ReservationController {
 
-    private final List<Reservation> reservations = new ArrayList<>();
-    private final AtomicLong index = new AtomicLong(0);
+    private final ReservationDAO reservationDAO;
+
+    public ReservationController(ReservationDAO reservationDAO) {
+        this.reservationDAO = reservationDAO;
+    }
 
     @GetMapping("/reservation")
     public String goReservationPage() {
@@ -25,35 +26,38 @@ public class ReservationController {
     }
 
     @PostMapping("/reservations")
-    public ResponseEntity<Reservation> createReservation(@RequestBody Reservation reservation) {
-        if (isReservationArgumentEmpty(reservation)) {
+    public ResponseEntity<ReservationResponseDto> createReservation(@RequestBody ReservationSaveRequestDto requestDto) {
+        if (isReservationArgumentEmpty(requestDto)) {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }
-        Reservation newReservation = Reservation.of(index.incrementAndGet(), reservation);
-        reservations.add(newReservation);
-        return ResponseEntity.created(URI.create("/reservations/" + newReservation.getId())).body(newReservation);
+
+        Reservation reservation = new Reservation(requestDto.getName(), requestDto.getDate(), requestDto.getTime());
+
+        Long id = reservationDAO.insert(reservation);
+
+        return ResponseEntity.created(URI.create("/reservations/" + id))
+                .body(new ReservationResponseDto(id, reservation));
     }
 
     @GetMapping("/reservations")
-    public ResponseEntity<List<Reservation>> readAllReservations() {
-        return ResponseEntity.ok().body(reservations);
+    public ResponseEntity<List<ReservationResponseDto>> readAllReservations() {
+        List<ReservationResponseDto> reservationResponseDtos = reservationDAO.findAllReservations()
+                .stream()
+                .map(ReservationResponseDto::new)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok().body(reservationResponseDtos);
     }
 
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
-        Reservation reservation = reservations.stream()
-                .filter(it -> Objects.equals(it.getId(), id))
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
-
-        reservations.remove(reservation);
-
+        reservationDAO.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    private boolean isReservationArgumentEmpty(Reservation reservation) {
-        return isStringEmpty(reservation.getName()) || isStringEmpty(reservation.getDate()) || isStringEmpty(
-                reservation.getTime());
+    private boolean isReservationArgumentEmpty(ReservationSaveRequestDto requestDto) {
+        return isStringEmpty(requestDto.getName())
+                || isStringEmpty(requestDto.getDate())
+                || isStringEmpty(requestDto.getTime());
     }
 
     private boolean isStringEmpty(String argument) {

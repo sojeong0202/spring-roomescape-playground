@@ -227,4 +227,22 @@ public class MissionStepTest {
                 .statusCode(201)
                 .header("Location", "/times/1");
     }
+
+    @Test
+    @DisplayName("모든 시간 조회 API 테스트")
+    void should_readAllTimes_when_getMethodTimesURI() {
+        Map<String, String> params = new HashMap<>();
+        params.put("time", "10:00");
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(params)
+                .when().post("/times");
+
+        RestAssured.given().log().all()
+                .when().get("/times")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(1));
+    }
 }

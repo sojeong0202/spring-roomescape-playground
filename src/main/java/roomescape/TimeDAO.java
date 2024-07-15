@@ -1,7 +1,9 @@
 package roomescape;
 
 import java.sql.PreparedStatement;
+import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -29,4 +31,18 @@ public class TimeDAO {
 
         return keyHolder.getKey().longValue();
     }
+
+    public List<Time> findAllTimes() {
+        String sql = "SELECT id, time FROM time";
+
+        return jdbcTemplate.query(sql, actorRowMapper);
+    }
+
+    private final RowMapper<Time> actorRowMapper = (resultSet, rowNum) -> {
+        Time time = new Time(
+                resultSet.getLong("id"),
+                resultSet.getString("time")
+        );
+        return time;
+    };
 }

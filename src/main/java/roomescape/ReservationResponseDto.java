@@ -2,10 +2,10 @@ package roomescape;
 
 public class ReservationResponseDto {
 
-    private final Long id;
-    private final String name;
-    private final String date;
-    private final String time;
+    private Long id;
+    private String name;
+    private String date;
+    private String time;
 
     public ReservationResponseDto(Reservation reservation) {
         this.id = reservation.getId();

@@ -38,6 +38,11 @@ public class TimeDAO {
         return jdbcTemplate.query(sql, actorRowMapper);
     }
 
+    public void delete(Long id) {
+
+        jdbcTemplate.update("DELETE FROM time WHERE id = ?", id);
+    }
+
     private final RowMapper<Time> actorRowMapper = (resultSet, rowNum) -> {
         Time time = new Time(
                 resultSet.getLong("id"),

@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -39,6 +41,12 @@ public class TimeController {
                 .map(TimeResponseDto::new)
                 .collect(Collectors.toList());
         return ResponseEntity.ok().body(timeResponseDtos);
+    }
+
+    @DeleteMapping("/times/{id}")
+    public ResponseEntity<Void> deleteTime(@PathVariable Long id) {
+        timeDAO.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     private boolean isTimeArgumentEmpty(TimeSaveRequestDto requestDto) {

@@ -1,4 +1,6 @@
-package roomescape;
+package roomescape.dto;
+
+import roomescape.domain.Time;
 
 public class TimeResponseDto {
 

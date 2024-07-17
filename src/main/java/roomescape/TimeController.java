@@ -20,8 +20,13 @@ public class TimeController {
         this.timeDAO = timeDAO;
     }
 
+    @GetMapping("/time")
+    public String goReservationPage() {
+        return "time";
+    }
+
     @PostMapping("/times")
-    public ResponseEntity<TimeResponseDto> createReservation(@RequestBody TimeSaveRequestDto requestDto) {
+    public ResponseEntity<TimeResponseDto> createTime(@RequestBody TimeSaveRequestDto requestDto) {
         if (isTimeArgumentEmpty(requestDto)) {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }

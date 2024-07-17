@@ -8,6 +8,6 @@ public class TimeSaveRequestDto {
     }
 
     public String getTime() {
-        return this.time;
+        return time;
     }
 }

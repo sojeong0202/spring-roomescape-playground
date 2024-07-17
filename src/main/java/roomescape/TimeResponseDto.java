@@ -16,10 +16,10 @@ public class TimeResponseDto {
     }
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public String getTime() {
-        return this.time;
+        return time;
     }
 }

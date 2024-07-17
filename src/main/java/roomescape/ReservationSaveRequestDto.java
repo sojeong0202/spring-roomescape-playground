@@ -4,20 +4,20 @@ public class ReservationSaveRequestDto {
 
     private String name;
     private String date;
-    private String time;
+    private Long time;
 
     public ReservationSaveRequestDto() {
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public String getDate() {
-        return this.date;
+        return date;
     }
 
-    public String getTime() {
-        return this.time;
+    public Long getTime() {
+        return time;
     }
 }

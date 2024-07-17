@@ -15,14 +15,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class ReservationController {
 
     private final ReservationDAO reservationDAO;
+    private final TimeDAO timeDAO;
 
-    public ReservationController(ReservationDAO reservationDAO) {
+    public ReservationController(ReservationDAO reservationDAO, TimeDAO timeDAO) {
         this.reservationDAO = reservationDAO;
+        this.timeDAO = timeDAO;
     }
 
     @GetMapping("/reservation")
     public String goReservationPage() {
-        return "reservation";
+        return "new-reservation";
     }
 
     @PostMapping("/reservations")
@@ -31,9 +33,11 @@ public class ReservationController {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }
 
-        Reservation reservation = new Reservation(requestDto.getName(), requestDto.getDate(), requestDto.getTime());
+        Time time = timeDAO.findById(requestDto.getTime()).get();
 
-        Long id = reservationDAO.insert(reservation);
+        Reservation reservation = new Reservation(requestDto.getName(), requestDto.getDate(), time);
+
+        Long id = reservationDAO.insert(reservation, reservation.getTime().getId());
 
         return ResponseEntity.created(URI.create("/reservations/" + id))
                 .body(new ReservationResponseDto(id, reservation));
@@ -56,8 +60,7 @@ public class ReservationController {
 
     private boolean isReservationArgumentEmpty(ReservationSaveRequestDto requestDto) {
         return isStringEmpty(requestDto.getName())
-                || isStringEmpty(requestDto.getDate())
-                || isStringEmpty(requestDto.getTime());
+                || isStringEmpty(requestDto.getDate()) || (requestDto.getTime() == null);
     }
 
     private boolean isStringEmpty(String argument) {

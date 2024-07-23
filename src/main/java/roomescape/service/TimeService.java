@@ -22,10 +22,7 @@ public class TimeService {
             throw new IllegalArgumentException("잘못된 요청입니다.");
         }
 
-        Time time = new Time(requestDto.getTime());
-        Long id = timeDAO.insert(time);
-
-        return new TimeResponseDto(id, time);
+        return new TimeResponseDto(timeDAO.insert(new Time(requestDto.getTime())));
     }
 
     public List<TimeResponseDto> readAllTimes() {

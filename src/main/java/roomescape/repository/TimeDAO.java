@@ -19,7 +19,7 @@ public class TimeDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Long insert(Time time) {
+    public Time insert(Time time) {
         String sql = "INSERT INTO time (time) VALUES ?";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -31,7 +31,7 @@ public class TimeDAO {
             return ps;
         }, keyHolder);
 
-        return keyHolder.getKey().longValue();
+        return findById(keyHolder.getKey().longValue()).get();
     }
 
     public List<Time> findAllTimes() {

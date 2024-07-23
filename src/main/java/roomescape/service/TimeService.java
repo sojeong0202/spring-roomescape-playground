@@ -29,7 +29,7 @@ public class TimeService {
         return timeDAO.findAllTimes()
                 .stream()
                 .map(TimeResponseDto::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void deleteTime(Long id) {

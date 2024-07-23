@@ -38,7 +38,7 @@ public class ReservationService {
         return reservationDAO.findAllReservations()
                 .stream()
                 .map(ReservationResponseDto::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public void deleteReservation(Long id) {

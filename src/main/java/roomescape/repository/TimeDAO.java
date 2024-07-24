@@ -31,7 +31,8 @@ public class TimeDAO {
             return ps;
         }, keyHolder);
 
-        return findById(keyHolder.getKey().longValue()).get();
+        Long id = keyHolder.getKey().longValue();
+        return new Time(id, time.getTime());
     }
 
     public List<Time> findAllTimes() {
